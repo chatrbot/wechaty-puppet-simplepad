@@ -8,7 +8,8 @@
   "main": "dist/puppet-simplepad.js",
   "scripts": {
     "clean": "rm -rf dist/*",
-    "build": "npm run clean && tsc"
+    "build": "npm run clean && tsc",
+    "publish": "npm run build && npm publish"
   },
   "repository": {
     "type": "git",
@@ -42,6 +43,7 @@
     "@typescript-eslint/parser": "^4.22.1",
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^8.3.0",
+    "prettier": "^2.3.0",
     "typescript": "^4.2.4",
     "wechaty": "^0.60.10"
   },
