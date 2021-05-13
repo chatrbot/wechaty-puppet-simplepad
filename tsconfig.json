@@ -1,20 +1,21 @@
 {
-  "extends": "@chatie/tsconfig",
-  "compilerOptions": {
-    "outDir": "dist",
-  },
   "exclude": [
     "node_modules/",
-    "dist/",
-    "tests/fixtures/",
+    "dist/"
   ],
   "include": [
-    "app/**/*.ts",
-    "bin/*.ts",
-    "bot/**/*.ts",
-    "examples/**/*.ts",
-    "scripts/**/*.ts",
-    "src/**/*.ts",
-    "tests/**/*.spec.ts",
+    "src/**/*",
   ],
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "removeComments": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true
+  }
 }

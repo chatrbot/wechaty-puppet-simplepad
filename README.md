@@ -1,149 +1,90 @@
-# PUPPET-MOCK
-
-[![NPM Version](https://badge.fury.io/js/wechaty-puppet-mock.svg)](https://badge.fury.io/js/wechaty-puppet-mock)
-[![npm (tag)](https://img.shields.io/npm/v/wechaty-puppet-mock/next.svg)](https://www.npmjs.com/package/wechaty-puppet-mock?activeTab=versions)
-[![NPM](https://github.com/wechaty/wechaty-puppet-mock/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty-puppet-mock/actions?query=workflow%3ANPM)
-
-![chatie puppet](https://wechaty.github.io/wechaty-puppet-mock/images/mock.png)
-
-> Picture Credit: <https://softwareautotools.com/2017/03/01/mocking-explained-in-python/>
+# WECHATY-PUPPET-SIMPLEPAD
 
 [![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-brightgreen.svg)](https://github.com/wechaty/wechaty)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](https://www.typescriptlang.org/)
+![Stage](https://img.shields.io/badge/Stage-beta-yellow)
 
-Puppet Mocker & Starter Template for Wechaty, it is very useful when you:
+## 如何开始使用
+### (TODO)
 
-1. Want to test the Wechaty framework with a mock puppet, or
-1. You want to write your own Puppet implenmentation.
+## SimplePad的优势
+- ### 架构清晰易懂
+  SimplePad是以一套完整的Http协议接口为基础进行的Puppet实现.所有主动操作底层都是以Http调用为主,简单明了.
+  消息接收使用了WebSocket,方便开发者能够在本地开发调试(在没有公网IP的情况下).
 
-Then `PuppetMock` will helps you a lot.
+- ### 扩展方便快捷
+  >- 如果您擅长的是Java/Python/Go等其他语言或者苦于Node的繁琐?
+  >- 如果您只是想简单的使用Wechaty的某个功能?
+  >- 如果您想快速集成相关功能到您已有的项目中?
 
-## USAGE
+  **我们有全套完整的Http协议的接口,只需要进行简单的Http调用即可实现您想要的功能.**
 
-### Puppet Mock
+  >- 那么如何接收机器人收到的消息?
 
-```ts
-import { Wechaty }   from 'wechaty'
-import { PuppetMock } from 'wechaty-puppet-mock'
+  **我们支持`Http回调`和`Websocket`两种方式,让您有轻松愉快的开发体验.**
 
-const puppet  = new PuppetMock()
-const wechaty = new Wechaty({ puppet })
+- ### 提供快捷的操作后台
+  在您获取到TOKEN后我们会提供一个快捷的操作后台,让你更为方便的管理自己的TOKEN,并且提供类Postman的接口调试工具来高效的开发和调试.
 
-wechaty.start()
-```
+## PUPPET功能对比
+SimplePad是目前功能最为完善,接口最为全面(支持Http协议调用),使用最为方便的Puppet实现之一.
 
-### Mocker & Environment
-
-```ts
-import {
-  PuppetMock,
-  Mocker,
-  SimpleEnvironment,
-}                     from 'wechaty-puppet-mock'
-
-const mocker = new Mocker()
-mocker.use(SimpleEnvironment())
-
-const puppet = new PuppetMock({ mocker })
-const wechaty = new Wechaty({ puppet })
-
-wechaty.start()
-
-// The Mocker will start perform the SimpleEnvironment...
-```
-
-See: [SimpleEnvironment](src/mocker/environment.ts)
-
-## API Reference
-
-### Mocker
-
-```ts
-import { Wechaty }  from 'wechaty'
-import { PuppetMock, mock }   from 'wechaty-puppet-mock'
-
-const mocker = new mock.Mocker()
-const puppet = new PuppetMock({ mocker })
-const bot = new Wechaty({ puppet })
-
-await bot.start()
-
-mocker.scan('https://github.com/wechaty', 1)
-
-const user = mocker.createContact()
-mocker.login(user)
-
-const contact = mocker.createContact()
-const room = mocker.createRoom()
-
-user.say('Hello').to(contact)
-contact.say('World').to(user)
-```
-
-## HELPER UTILITIES
-
-### StateSwitch
-
-```ts
-this.state.on('pending')
-this.state.on(true)
-this.state.off('pending')
-this.state.off(true)
-
-await this.state.ready('on')
-await this.state.ready('off')
-
-```
-
-### Watchdog
-
-```ts
-```
-
-### MemoryCard
-
-```ts
-await memory.set('config', { id: 1, key: 'xxx' })
-const config = await memory.get('config')
-console.log(config)
-// Output: { id: 1, key: 'xxx' }
-```
-
-## HISTORY
-
-### master
-
-### v0.25 (July 13, 2020)
-
-1. Rename `MockXXX` to `XXXMock` for keep the consistent naming style with `PuppetMock`.
-1. Export `mock` namespace and move all related modules under it.
-
-### v0.22 (June 4, 2020)
-
-`Mocker` Released. `Mocker` is a manager for controlling the behavior of the Puppet activities.
-
-1. Add `MockContact`, `MockRoom`, and `MockMessage` for `Mockers`
-1. Add `MockEnvironment` for mocking the server behaviors.
-1. Support `Wechaty#Contact.find()` from the `mocker.createContacts()`
-1. Support `Wechaty#Room.find()` from the `mocker.createRooms()`
-1. Support `message` event for `talker`, `listener`, and `room` of `MockMessage`
-
-### v0.0.1 (Jun 27, 2018)
-
-Initial version.
-
-`PuppetMock` is a skelton Puppet without do anything, it will make testing easy when developing Wechaty
-
-## AUTHOR
-
-[Huan LI](http://linkedin.com/in/zixia) \<zixia@zixia.net\>
-
-<a href="https://stackexchange.com/users/265499">
-  <img src="https://stackexchange.com/users/flair/265499.png" width="208" height="58" alt="profile for zixia on Stack Exchange, a network of free, community-driven Q&amp;A sites" title="profile for zixia on Stack Exchange, a network of free, community-driven Q&amp;A sites">
-</a>
-
-## COPYRIGHT & LICENSE
-
-* Code & Docs © 2018 Huan LI \<zixia@zixia.net\>
-* Code released under the Apache-2.0 License
-* Docs released under Creative Commons
+Puppet|donut|wxwork|paimon|padlocal|simplepad👍
+:---|:---:|:---:|:---:|:---:|:---:|
+支持账号|个人微信|企业微信|个人微信|个人微信|个人微信
+**<消息>**|
+收发文本|✅|✅|✅|✅|✅
+收发个人名片|✅|✅|✅|✅|✅
+收发图文链接|✅|✅|✅|✅|✅
+发送图片、文件|✅|✅|✅（较慢）|✅|✅
+接收图片、文件|✅|✅|✅|✅|✅
+发送视频|✅|✅|✅（较慢）|✅|✅
+接收视频|✅|✅|✅|✅|✅
+发送小程序|✅|✅|✅|✅|✅
+接收动图|❌|✅|❌|✅|✅
+发送动图|✅|✅|✅（以文件形式发送）|✅（以文件形式发送）|✅(以文件形式发送)
+接收语音消息|✅|✅|❌|✅|✅
+发送语音消息|❌|❌|❌|✅|✅
+转发文本|✅|✅|✅|✅|✅
+转发图片|✅|✅|✅|✅|✅
+转发图文链接|✅|✅|❌|✅|✅
+转发音频|✅|✅|❌|✅|✅
+转发视频|✅|✅|✅|✅|✅
+转发文件|✅|✅|✅|✅|✅
+转发动图|❌|✅|❌|✅|✅
+转发小程序|✅|✅|✅|✅|✅
+**<群组>**|
+创建群聊|✅|✅|✅|✅|✅
+设置群公告|✅|✅|✅|✅|✅
+获取群公告|❌|❌|✅|✅|✅
+群二维码|❌|❌|❌|✅|✅
+拉人进群|✅|✅|✅|✅|✅
+踢人出群|✅|✅|✅|✅|✅
+退出群聊|✅|❌|✅|✅|✅
+改群名称|✅|✅|❌|✅|✅
+入群事件|✅|✅|✅|✅|✅
+离群事件|✅|✅|✅|✅|✅
+群名称变更事件|✅|✅|❌|✅|✅
+@群成员|✅|✅|✅|✅|✅
+群列表|✅|✅|✅|✅|✅
+群成员列表|✅|✅|✅|✅|✅
+群详情|✅|✅|✅|✅|✅
+**<联系人>**|
+修改备注|✅|✅|❌|✅|✅
+添加好友|✅|✅|❌|✅|✅
+自动通过好友|✅|✅|✅|✅|✅
+好友列表|✅|✅|✅|✅|✅
+好友详情|✅|✅|✅|✅|✅
+**<朋友圈(http协议)>**|
+朋友圈列表|❌|❌|❌|❌|✅
+朋友圈详情|❌|❌|❌|❌|✅
+朋友圈点赞|❌|❌|❌|❌|✅
+发送朋友圈|❌|❌|❌|❌|✅
+删除朋友圈|❌|❌|❌|❌|✅
+修改朋友圈背景图|❌|❌|❌|❌|✅
+**<其他>**|
+登录事件|✅|✅|✅|✅|✅
+扫码状态|❌|❌|❌|✅|✅
+登出事件|✅|✅|❌|✅|✅
+主动退出登录|✅|❌|✅|✅|✅
+依赖协议|Windows|Windows|iPad|iPad|iPad
