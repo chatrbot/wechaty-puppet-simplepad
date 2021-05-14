@@ -1,6 +1,5 @@
 import { Message } from '../../defined'
 import { xmlToJson } from '../../utils/xml-to-json'
-import { log } from 'wechaty-puppet'
 
 export enum AppMessageType {
     Text = 1,
@@ -95,15 +94,8 @@ export async function appMessageParser(
 
     const appMsgXml: AppMsgXmlSchema = await xmlToJson(tryXmlText)
     try {
-        const {
-            title,
-            des,
-            url,
-            thumburl,
-            type,
-            md5,
-            recorditem
-        } = appMsgXml.msg.appmsg
+        const { title, des, url, thumburl, type, md5, recorditem } =
+            appMsgXml.msg.appmsg
 
         let appattach: AppAttachPayload | undefined
         const tmp = appMsgXml.msg.appmsg.appattach
@@ -133,7 +125,6 @@ export async function appMessageParser(
             url
         }
     } catch (e) {
-        console.log(`解析xml失败${e}`)
         throw new Error(
             '解析消息失败,该消息可能是发送消息并不是接收消息(发送出去的消息对象可能结构不完整,只是用于消息撤回)'
         )

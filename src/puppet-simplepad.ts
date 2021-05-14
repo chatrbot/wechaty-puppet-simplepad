@@ -196,7 +196,7 @@ class PuppetSimplePad extends Puppet {
                 if (recv === 'pong') {
                     return
                 }
-                console.log('recv', recv)
+                log.verbose('recv', recv)
                 try {
                     const recvData = JSONParse(recv)
                     // 接收到的各种推送消息

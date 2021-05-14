@@ -1,15 +1,13 @@
 {
   "name": "wechaty-puppet-simplepad",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Another implementation of Wechaty-Puppet",
-  "directories": {
-    "test": "tests"
-  },
+  "files": ["/dist","./README.md"],
   "main": "dist/puppet-simplepad.js",
   "scripts": {
     "clean": "rm -rf dist/*",
-    "build": "npm run clean && tsc",
-    "publish": "npm run build && npm publish"
+    "dist": "npm run clean && tsc",
+    "release": "npm run dist && npm publish"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,5 @@
 import { Message } from '../../defined'
-import { EventMessagePayload, log } from 'wechaty-puppet'
-import { Puppet } from 'wechaty-puppet'
+import { Puppet, EventMessagePayload, log } from 'wechaty-puppet'
 import {
     MessageCategory,
     ParsedMessage,
