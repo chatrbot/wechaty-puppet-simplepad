@@ -5,7 +5,20 @@
 ![Stage](https://img.shields.io/badge/Stage-beta-yellow)
 
 ## 如何开始使用
-### (TODO)
+1. clone我们的demo项目
+```shell
+$ git clone https://github.com/chatrbot/wechaty-puppet-simplepad-demo.git
+```
+2. 安装相应的依赖  
+```shell
+$ cd wechaty-puppet-simplepad-demo
+$ npm install
+```
+3. 执行运行命令,把{YOUR_TOKEN}替换为您自己的token
+```shell
+$ npx ts-node ./bot.ts -t {YOUR_TOKEN}
+```
+> 更多信息可以阅读[wiki](https://github.com/chatrbot/wechaty-puppet-simplepad/wiki)和[demo](https://github.com/chatrbot/wechaty-puppet-simplepad-demo)的介绍.
 
 ## SimplePad的优势
 - ### 架构清晰易懂
