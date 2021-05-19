@@ -468,7 +468,8 @@ class PuppetSimplePad extends Puppet {
             name: contact.nickName,
             alias: contact.alias,
             phone: [],
-            type: ContactType.Unknown
+            type: ContactType.Unknown,
+            friend: !contact.isChatroomMember
         }
     }
 
@@ -490,6 +491,15 @@ class PuppetSimplePad extends Puppet {
 
     async contactSelfSignature(signature: string): Promise<void> {
         await this._client.ModifySignature(signature)
+    }
+
+    async deleteContact(userName: string): Promise<void> {
+        try {
+            await this._client.DeleteContact(userName)
+            this._cacheMgr?.deleteContact(userName)
+        } catch (err) {
+            log.error('删除联系人失败', err)
+        }
     }
 
     ding(data?: string): void {

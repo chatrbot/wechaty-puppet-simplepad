@@ -58,7 +58,7 @@ class SimplePadAPI {
         this.http.interceptors.response.use(
             (response: AxiosResponse<BaseResponse>) => {
                 if (response.data.code !== 0 && response.data.code !== 200) {
-                    log.error(PRE, 'request api err %s', response.data.msg)
+                    log.verbose(PRE, 'request api err %s', response.data.msg)
                     return Promise.reject(response.data.msg)
                 }
                 return response
@@ -155,6 +155,10 @@ class SimplePadAPI {
         return this.request<Contact>(URI.GetContactDetail, {
             userName: contactId
         })
+    }
+
+    async DeleteContact(userName: string) {
+        return this.request(URI.DelContact, { userName })
     }
 
     async InitContact(chatroomSeq: number, contactSeq: number) {
