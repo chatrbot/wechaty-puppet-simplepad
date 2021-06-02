@@ -53,6 +53,7 @@ class SimplePadAPI {
                 request.url,
                 JSON.stringify(request.data)
             )
+            request.headers = { ...request.headers, 'TOKEN-TYPE': 'simplepad' }
             return request
         })
         this.http.interceptors.response.use(
