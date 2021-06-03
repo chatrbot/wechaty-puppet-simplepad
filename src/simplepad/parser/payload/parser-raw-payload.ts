@@ -18,6 +18,10 @@ export const ParseRawToMessagePayload = async (
         text: msg.content
     }
     if (isRoomId(msg.fromUser)) {
+        const parts = msg.content.split(':\n')
+        if (parts && parts.length > 1) {
+            payload.fromId = parts[0]
+        }
         payload.roomId = msg.fromUser
         if (!/^<msg>.*/.test(payload.text)) {
             payload.text = payload.text.replace(/^[^\n]+\n/, '')
