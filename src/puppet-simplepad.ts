@@ -100,9 +100,9 @@ class PuppetSimplePad extends Puppet {
                 PRE,
                 'start() is called on a ON puppet. await ready(on) and return.'
             )
-            await this.state.ready('on')
             return
         }
+        await this.state.on(true)
 
         const online = await this._client.GetOnlineStatus()
         log.info(PRE, 'online status:%s', online)
@@ -148,6 +148,15 @@ class PuppetSimplePad extends Puppet {
                             data.status === QRStatus.Timeout
                         ) {
                             clearInterval(checkTimer)
+                        }
+
+                        // 二维码过期或取消扫码重新获取
+                        if (
+                            data.status === QRStatus.Timeout ||
+                            data.status === QRStatus.Cancel
+                        ) {
+                            this.manualLogin()
+                            return
                         }
 
                         if (data.status === QRStatus.Confirmed) {
@@ -260,16 +269,22 @@ class PuppetSimplePad extends Puppet {
                             if (
                                 room.chatroomVersion != notify.chatroomVersion
                             ) {
+                                log.verbose(
+                                    `群信息更新:${room.userName} ${room.nickName}`
+                                )
                                 room.chatroomVersion = notify.chatroomVersion
 
                                 const members =
                                     await this._cacheMgr!.getRoomMember(
                                         notify.userName
                                     )
+                                log.verbose(
+                                    `群成员信息变动:${JSON.stringify(members)}`
+                                )
                                 if (members) {
                                     // 有新成员加入
                                     if (
-                                        notify.chatroomMembers.length >
+                                        notify.chatroomMembers.length >=
                                         Object.keys(members).length
                                     ) {
                                         const newMembers =
@@ -277,6 +292,11 @@ class PuppetSimplePad extends Puppet {
                                                 notify.userName,
                                                 notify.chatroomVersion
                                             )
+                                        log.verbose(
+                                            `NewMembersInfo:${JSON.stringify(
+                                                newMembers
+                                            )}`
+                                        )
                                         newMembers.memberList.map((member) => {
                                             members[member.userName] = member
                                         })
@@ -311,8 +331,7 @@ class PuppetSimplePad extends Puppet {
                         }
                     }
                 } catch (err) {
-                    log.error('解析JSON数据失败' + err)
-                    throw new Error('parse string to json err' + err)
+                    log.error(`解析JSON数据失败:${err},数据:${recv}`)
                 }
             }
         })
@@ -325,7 +344,7 @@ class PuppetSimplePad extends Puppet {
                 try {
                     this._ws = new WebSocket(url)
                     log.info('websocket重连成功')
-                    break
+                    return
                 } catch (err) {
                     log.error(PRE, '重连websocket失败:%s,将在5秒后重试', err)
                     await new Promise((r) => setTimeout(r, 5000))
@@ -1196,7 +1215,7 @@ class PuppetSimplePad extends Puppet {
     async stop(): Promise<void> {
         this._client?.Logout().then(() => {
             this._heartbeatTimer && clearInterval(this._heartbeatTimer)
-            this.state.off()
+            this.state.off(true)
             log.info('账户登出')
         })
     }
