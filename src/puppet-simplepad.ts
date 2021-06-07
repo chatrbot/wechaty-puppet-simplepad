@@ -282,7 +282,7 @@ class PuppetSimplePad extends Puppet {
                                     `群成员信息变动:${JSON.stringify(members)}`
                                 )
                                 if (members) {
-                                    // 有新成员加入
+                                    // 有新成员加入或群内成员信息更新
                                     if (
                                         notify.chatroomMembers.length >=
                                         Object.keys(members).length
@@ -303,6 +303,10 @@ class PuppetSimplePad extends Puppet {
                                         this._cacheMgr?.setRoomMember(
                                             notify.userName,
                                             members
+                                        )
+                                        await this.dirtyPayload(
+                                            PayloadType.RoomMember,
+                                            room.userName
                                         )
                                     }
 
@@ -1007,7 +1011,8 @@ class PuppetSimplePad extends Puppet {
             avatar: rawPayload.bigHeadImgUrl,
             id: rawPayload.userName,
             name: rawPayload.nickName,
-            inviterId: rawPayload.inviterUserName
+            inviterId: rawPayload.inviterUserName,
+            roomAlias: rawPayload.displayName
         }
     }
 
