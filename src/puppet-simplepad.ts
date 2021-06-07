@@ -22,7 +22,9 @@ import {
 import {
     ChatroomMember,
     ChatroomNotify,
+    ClientQuitAccount,
     Contact,
+    HeartbeatCheckReply,
     Label,
     Message,
     MessageRevokeInfo,
@@ -59,6 +61,7 @@ log.silly(PRE, 'set level to %s', logLevel)
 
 class PuppetSimplePad extends Puppet {
     private _ws?: WebSocket
+    private _wsNeedReconnect = false
     private _self?: User
     private _client: SimplePadClient
     private _cacheMgr?: CacheManager
@@ -172,6 +175,7 @@ class PuppetSimplePad extends Puppet {
 
     protected async login(): Promise<void> {
         await this.initSelf()
+        this._wsNeedReconnect = true
 
         if (!this._self) {
             throw new Error('this._self not init')
@@ -202,9 +206,20 @@ class PuppetSimplePad extends Puppet {
         })
         this._ws?.on('message', async (recv: WebSocket.Data) => {
             if (typeof recv === 'string') {
-                if (recv === 'pong') {
+                if (recv === HeartbeatCheckReply) {
                     return
                 }
+                // 终端主动退出账户
+                if (recv === ClientQuitAccount) {
+                    log.info(`${this._self?.nickName}在手机端退出登录`)
+
+                    this._wsNeedReconnect = false
+                    this._ws?.close()
+                    await this.logout()
+                    this.manualLogin()
+                    return
+                }
+
                 log.verbose('recv', recv)
                 try {
                     const recvData = JSONParse(recv)
@@ -342,7 +357,7 @@ class PuppetSimplePad extends Puppet {
         this._ws?.on('close', async () => {
             this._heartbeatTimer && clearInterval(this._heartbeatTimer)
             while (true) {
-                if (!this.state.on()) {
+                if (!this.state.on() || !this._wsNeedReconnect) {
                     break
                 }
                 try {
