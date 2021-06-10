@@ -362,6 +362,7 @@ class PuppetSimplePad extends Puppet {
                 }
                 try {
                     this._ws = new WebSocket(url)
+                    this.registerWebSocketListeners(url)
                     log.info('websocket重连成功')
                     return
                 } catch (err) {
