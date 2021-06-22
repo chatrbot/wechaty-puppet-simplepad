@@ -90,7 +90,7 @@ class PuppetSimplePad extends Puppet {
             )
         }
         this.options.token = token
-        this._client = new SimplePadAPI(token)
+        this._client = new SimplePadAPI(token, this)
     }
 
     async start(): Promise<void> {
@@ -107,17 +107,12 @@ class PuppetSimplePad extends Puppet {
         }
         await this.state.on(true)
 
-        const online = await this._client.GetOnlineStatus()
-        log.info(PRE, 'online status:%s', online)
-        if (!online) {
-            this.manualLogin()
-            return
-        }
+        // 默认为已经在服务端登录,在启动时候会获取一次个人信息,获取失败则走扫码登录流程
         await this.login()
     }
 
     // manualLogin 未登录,重新扫码登录
-    private manualLogin() {
+    manualLogin() {
         this._client
             .GetQRCode()
             .then((data) => {
@@ -142,39 +137,60 @@ class PuppetSimplePad extends Puppet {
                     [QRStatus.Timeout]: ScanStatus.Timeout
                 }
                 const checkTimer = setInterval(() => {
-                    this._client.CheckScanStatus().then((data) => {
-                        this.emit('scan', { status: statusMap[data.status] })
+                    this._client
+                        .CheckScanStatus()
+                        .then((data) => {
+                            this.emit('scan', {
+                                status: statusMap[data.status]
+                            })
 
-                        if (
-                            data.status === QRStatus.Confirmed ||
-                            data.status === QRStatus.Cancel ||
-                            data.status === QRStatus.Timeout
-                        ) {
-                            clearInterval(checkTimer)
-                        }
+                            if (
+                                data.status === QRStatus.Confirmed ||
+                                data.status === QRStatus.Cancel ||
+                                data.status === QRStatus.Timeout
+                            ) {
+                                clearInterval(checkTimer)
+                            }
 
-                        // 二维码过期或取消扫码重新获取
-                        if (
-                            data.status === QRStatus.Timeout ||
-                            data.status === QRStatus.Cancel
-                        ) {
+                            // 二维码过期或取消扫码重新获取
+                            if (
+                                data.status === QRStatus.Timeout ||
+                                data.status === QRStatus.Cancel
+                            ) {
+                                this.manualLogin()
+                                return
+                            }
+
+                            if (data.status === QRStatus.Confirmed) {
+                                this._client.Login().then(async () => {
+                                    await new Promise((r) =>
+                                        setTimeout(r, 1000)
+                                    )
+                                    await this.login()
+                                })
+                            }
+                        })
+                        .catch((err) => {
+                            // 获取二维码状态失败后重新获取
+                            log.error('获取二维码状态失败', err)
+                            if (checkTimer) {
+                                clearInterval(checkTimer)
+                            }
                             this.manualLogin()
                             return
-                        }
-
-                        if (data.status === QRStatus.Confirmed) {
-                            this._client.Login().then(async () => {
-                                await new Promise((r) => setTimeout(r, 1000))
-                                await this.login()
-                            })
-                        }
-                    })
+                        })
                 }, 3000)
             })
     }
 
     protected async login(): Promise<void> {
-        await this.initSelf()
+        try {
+            await this.initSelf()
+        } catch (e) {
+            log.verbose('获取个人信息异常,可能已离线,重新登录')
+            return
+        }
+
         this._wsNeedReconnect = true
 
         if (!this._self) {
@@ -356,21 +372,16 @@ class PuppetSimplePad extends Puppet {
         })
         this._ws?.on('close', async () => {
             this._heartbeatTimer && clearInterval(this._heartbeatTimer)
-            while (true) {
-                if (!this.state.on() || !this._wsNeedReconnect) {
-                    break
-                }
-                try {
-                    this._ws = new WebSocket(url)
-                    this.registerWebSocketListeners(url)
-                    log.info('websocket重连成功')
-                    return
-                } catch (err) {
-                    log.error(PRE, '重连websocket失败:%s,将在5秒后重试', err)
-                    await new Promise((r) => setTimeout(r, 5000))
-                }
+            if (!this.state.on() || !this._wsNeedReconnect) {
+                log.info(PRE, 'websocket连接关闭')
+                return
             }
-            log.info(PRE, 'websocket连接关闭')
+
+            log.error(PRE, 'websocket连接断开,将在5秒后重试')
+            await new Promise((r) => setTimeout(r, 5000))
+
+            this._ws = new WebSocket(url)
+            this.registerWebSocketListeners(url)
         })
         this._ws?.on('error', (err) => {
             log.error(PRE, 'websocket发生错误:%s', err)

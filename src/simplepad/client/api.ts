@@ -35,13 +35,18 @@ import {
 import { BaseResponse } from '../defined'
 import { JSONParse } from '../utils/json-parse'
 import FormData from 'form-data'
+import { PuppetSimplePad } from '../../puppet-simplepad'
 
 const PRE = '[SimplePadAPI]'
 
 class SimplePadAPI {
     private http: AxiosInstance
 
-    constructor(protected token: string, timeout = 15) {
+    constructor(
+        protected token: string,
+        puppet: PuppetSimplePad,
+        timeout = 15
+    ) {
         this.http = axios.create({
             timeout: timeout * 1000,
             baseURL: SimplePadAPI.getBaseURL()
@@ -59,7 +64,15 @@ class SimplePadAPI {
         this.http.interceptors.response.use(
             (response: AxiosResponse<BaseResponse>) => {
                 if (response.data.code !== 0 && response.data.code !== 200) {
-                    log.verbose(PRE, 'request api err %s', response.data.msg)
+                    const errMsg = response.data.msg
+                    log.verbose(PRE, 'request api err %s', errMsg)
+                    if (
+                        errMsg.indexOf('请先登录') > -1 ||
+                        errMsg.indexOf('实例离线') > -1
+                    ) {
+                        console.log('重新获取二维码')
+                        puppet.manualLogin()
+                    }
                     return Promise.reject(response.data.msg)
                 }
                 return response
