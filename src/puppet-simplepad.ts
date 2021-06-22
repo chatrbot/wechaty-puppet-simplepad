@@ -35,7 +35,6 @@ import {
     User
 } from './simplepad/defined'
 import { isRoomId } from './simplepad/utils/is-helper'
-import SimplePadClient from './simplepad/client/simplePadClient'
 import { CacheManager, RoomMemberMap } from './simplepad/cache-manager'
 import SimplePadAPI from './simplepad/client/api'
 import WebSocket from 'ws'
@@ -63,7 +62,7 @@ class PuppetSimplePad extends Puppet {
     private _ws?: WebSocket
     private _wsNeedReconnect = false
     private _self?: User
-    private _client: SimplePadClient
+    private _client: SimplePadAPI
     private _cacheMgr?: CacheManager
     private _heartbeatTimer?: NodeJS.Timeout
 
