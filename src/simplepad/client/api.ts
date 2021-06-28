@@ -70,7 +70,6 @@ class SimplePadAPI {
                         errMsg.indexOf('请先登录') > -1 ||
                         errMsg.indexOf('实例离线') > -1
                     ) {
-                        console.log('重新获取二维码')
                         puppet.manualLogin()
                     }
                     return Promise.reject(response.data.msg)
@@ -113,7 +112,11 @@ class SimplePadAPI {
     }
 
     async GetQRCode(): Promise<QRCode> {
-        return this.request<QRCode>(URI.GetQRCode, { platform: 'ipad' })
+        return this.request<QRCode>(
+            URI.GetQRCode,
+            { platform: 'ipad' },
+            { timeout: 15 * 1000 }
+        )
     }
 
     async Logout() {

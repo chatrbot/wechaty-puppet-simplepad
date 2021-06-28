@@ -119,8 +119,7 @@ class PuppetSimplePad extends Puppet {
                     status: ScanStatus.Waiting,
                     qrcode: data.qrcode
                 })
-            })
-            .then(() => {
+
                 const QRStatus = {
                     Waiting: 0,
                     Scanned: 1,
@@ -156,6 +155,7 @@ class PuppetSimplePad extends Puppet {
                                 data.status === QRStatus.Timeout ||
                                 data.status === QRStatus.Cancel
                             ) {
+                                clearInterval(checkTimer)
                                 this.manualLogin()
                                 return
                             }
@@ -172,13 +172,13 @@ class PuppetSimplePad extends Puppet {
                         .catch((err) => {
                             // 获取二维码状态失败后重新获取
                             log.error('获取二维码状态失败', err)
-                            if (checkTimer) {
-                                clearInterval(checkTimer)
-                            }
-                            this.manualLogin()
-                            return
                         })
                 }, 3000)
+            })
+            .catch((err) => {
+                log.error('获取二维码失败', err)
+                this.manualLogin()
+                return
             })
     }
 
@@ -186,7 +186,7 @@ class PuppetSimplePad extends Puppet {
         try {
             await this.initSelf()
         } catch (e) {
-            log.verbose('获取个人信息异常,可能已离线,重新登录')
+            log.verbose('获取个人信息异常,可能已离线,开始重新获取二维码')
             return
         }
 
