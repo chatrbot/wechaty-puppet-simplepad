@@ -708,7 +708,6 @@ class PuppetSimplePad extends Puppet {
         throw new Error(`Can not get file for message: ${messageId}`)
     }
 
-    // FIXME 不同分辨率的图片下载
     async messageImage(
         messageId: string,
         imgType: ImageType
