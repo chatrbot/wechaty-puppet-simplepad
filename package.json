@@ -1,6 +1,6 @@
 {
   "name": "wechaty-puppet-simplepad",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Another implementation of Wechaty-Puppet",
   "files": ["/dist","./README.md"],
   "main": "dist/puppet-simplepad.js",

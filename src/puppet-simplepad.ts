@@ -24,6 +24,7 @@ import {
     ChatroomNotify,
     ClientQuitAccount,
     Contact,
+    DownloadImageType,
     HeartbeatCheckReply,
     Label,
     Message,
@@ -51,6 +52,7 @@ import { emotionPayloadParser } from './simplepad/parser/message/message-emotion
 import { FileBoxType } from 'file-box'
 import path from 'path'
 import { FileBoxJsonObjectUrl } from 'file-box/src/file-box.type'
+import { ImageXmlSchema } from './simplepad/parser/message/message-image'
 
 const PRE = '[PuppetSimplePad]'
 
@@ -707,7 +709,10 @@ class PuppetSimplePad extends Puppet {
     }
 
     // FIXME 不同分辨率的图片下载
-    async messageImage(messageId: string, _: ImageType): Promise<FileBox> {
+    async messageImage(
+        messageId: string,
+        imgType: ImageType
+    ): Promise<FileBox> {
         const message = await this.messageRawPayload(messageId)
         const messagePayload = await this.messageRawPayloadParser(message)
         if (messagePayload.type !== MessageType.Image) {
@@ -716,8 +721,29 @@ class PuppetSimplePad extends Puppet {
         if (!messagePayload.text) {
             throw new Error('图片消息XML不存在')
         }
-        const url = await this._client.DownloadImage(messagePayload.text)
-        return FileBox.fromUrl(url)
+        let type = DownloadImageType.Thumb
+        switch (imgType) {
+            case ImageType.HD:
+                type = DownloadImageType.HD
+                break
+            case ImageType.Artwork:
+                type = DownloadImageType.Origin
+                break
+        }
+
+        try {
+            const imgJson: ImageXmlSchema = await xmlToJson(messagePayload.text)
+            const schema = imgJson.msg.img.$
+
+            const url = await this._client.DownloadImageByKey(
+                schema.aeskey,
+                schema.cdnthumburl,
+                type
+            )
+            return FileBox.fromUrl(url)
+        } catch (err) {
+            throw new Error(`解析图片消息xml失败: ${err}`)
+        }
     }
 
     async messageMiniProgram(messageId: string): Promise<MiniProgramPayload> {
