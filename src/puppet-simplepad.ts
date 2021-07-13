@@ -67,6 +67,7 @@ class PuppetSimplePad extends Puppet {
     private _client: SimplePadAPI
     private _cacheMgr?: CacheManager
     private _heartbeatTimer?: NodeJS.Timeout
+    private _scanStatusCheck?: NodeJS.Timeout
 
     constructor(options: PuppetOptions) {
         super(options)
@@ -114,6 +115,8 @@ class PuppetSimplePad extends Puppet {
 
     // manualLogin 未登录,重新扫码登录
     manualLogin() {
+        this._scanStatusCheck && clearInterval(this._scanStatusCheck)
+
         this._client
             .GetQRCode()
             .then((data) => {
@@ -136,7 +139,7 @@ class PuppetSimplePad extends Puppet {
                     [QRStatus.Cancel]: ScanStatus.Cancel,
                     [QRStatus.Timeout]: ScanStatus.Timeout
                 }
-                const checkTimer = setInterval(() => {
+                this._scanStatusCheck = setInterval(() => {
                     this._client
                         .CheckScanStatus()
                         .then((data) => {
@@ -144,12 +147,17 @@ class PuppetSimplePad extends Puppet {
                                 status: statusMap[data.status]
                             })
 
-                            if (
-                                data.status === QRStatus.Confirmed ||
-                                data.status === QRStatus.Cancel ||
-                                data.status === QRStatus.Timeout
-                            ) {
-                                clearInterval(checkTimer)
+                            // 手机端确认
+                            if (data.status === QRStatus.Confirmed) {
+                                this._scanStatusCheck &&
+                                    clearInterval(this._scanStatusCheck)
+
+                                this._client.Login().then(async () => {
+                                    await new Promise((r) =>
+                                        setTimeout(r, 1000)
+                                    )
+                                    await this.login()
+                                })
                             }
 
                             // 二维码过期或取消扫码重新获取
@@ -157,18 +165,8 @@ class PuppetSimplePad extends Puppet {
                                 data.status === QRStatus.Timeout ||
                                 data.status === QRStatus.Cancel
                             ) {
-                                clearInterval(checkTimer)
                                 this.manualLogin()
                                 return
-                            }
-
-                            if (data.status === QRStatus.Confirmed) {
-                                this._client.Login().then(async () => {
-                                    await new Promise((r) =>
-                                        setTimeout(r, 1000)
-                                    )
-                                    await this.login()
-                                })
                             }
                         })
                         .catch((err) => {
