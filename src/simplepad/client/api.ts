@@ -3,6 +3,7 @@ import {
     FileBox,
     log,
     MiniProgramPayload,
+    PuppetOptions,
     UrlLinkPayload
 } from 'wechaty-puppet'
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
@@ -43,13 +44,14 @@ class SimplePadAPI {
     private http: AxiosInstance
 
     constructor(
-        protected token: string,
+        protected options: PuppetOptions,
         puppet: PuppetSimplePad,
         timeout = 15
     ) {
+        console.log('server', this.getBaseURL())
         this.http = axios.create({
             timeout: timeout * 1000,
-            baseURL: SimplePadAPI.getBaseURL()
+            baseURL: this.getBaseURL()
         })
         this.http.interceptors.request.use((request) => {
             log.verbose(
@@ -80,8 +82,12 @@ class SimplePadAPI {
     }
 
     // TODO 改为服务端下发方式来获取
-    private static getBaseURL() {
-        return 'http://121.199.64.183:8877'
+    private getBaseURL() {
+        return (
+            this.options.endpoint ||
+            process.env.SIMPLEPAD_ENDPOINT ||
+            'http://121.199.64.183:8877'
+        )
     }
 
     private async request<T = unknown>(
@@ -89,14 +95,14 @@ class SimplePadAPI {
         data?: unknown,
         config?: AxiosRequestConfig
     ): Promise<T> {
-        uri += '?token=' + this.token
+        uri += '?token=' + this.options.token
         return this.http.post(uri, data, config).then((response) => {
             return response.data.data
         })
     }
 
     GetWebSocketServerURL(): string {
-        return SimplePadAPI.getBaseURL() + '/ws?token=' + this.token
+        return this.getBaseURL() + '/ws?token=' + this.options.token
     }
 
     // ---- 基本操作 ----

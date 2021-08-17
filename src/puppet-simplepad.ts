@@ -92,7 +92,7 @@ class PuppetSimplePad extends Puppet {
             )
         }
         this.options.token = token
-        this._client = new SimplePadAPI(token, this)
+        this._client = new SimplePadAPI(options, this)
     }
 
     async start(): Promise<void> {
