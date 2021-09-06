@@ -1,8 +1,12 @@
 {
   "name": "wechaty-puppet-simplepad",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Another implementation of Wechaty-Puppet",
-  "files": ["/dist","./README.md"],
+  "type": "module",
+  "files": [
+    "/dist",
+    "./README.md"
+  ],
   "main": "dist/puppet-simplepad.js",
   "scripts": {
     "clean": "rm -rf dist/*",
@@ -43,7 +47,7 @@
     "eslint-config-prettier": "^8.3.0",
     "prettier": "^2.3.0",
     "typescript": "^4.2.4",
-    "wechaty": "^0.60.10"
+    "wechaty": "^0.68.1"
   },
   "peerDependencies": {
     "wechaty-puppet": ">=0.34"

@@ -1278,6 +1278,13 @@ class PuppetSimplePad extends Puppet {
      * 暂时不能实现的方法
      */
 
+    async conversationReadMark(
+        _conversationId: string,
+        _hasRead?: boolean
+    ): Promise<void | boolean> {
+        return
+    }
+
     async messageContact(_messageId: string): Promise<string> {
         throw new Error(`not implement`)
     }
@@ -1303,10 +1310,6 @@ class PuppetSimplePad extends Puppet {
         _contactId: string,
         _description: string | null
     ): Promise<void> {
-        throw new Error(`not implement`)
-    }
-
-    async conversationRead(_conversationId: string): Promise<void> {
         throw new Error(`not implement`)
     }
 
