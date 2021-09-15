@@ -38,7 +38,7 @@ export async function parseMessage(
                 }
             }
         } catch (e) {
-            log.error(PRE, `parse message error: ${e.stack}`)
+            log.error(PRE, `parse message error: ${e}`)
         }
     }
 

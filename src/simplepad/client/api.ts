@@ -48,10 +48,14 @@ class SimplePadAPI {
         puppet: PuppetSimplePad,
         timeout = 15
     ) {
-        console.log('server', this.getBaseURL())
+        let url = this.getBaseURL()
+        if (url.indexOf('http') === -1) {
+            url = 'http://' + url
+        }
+        console.log('server', url)
         this.http = axios.create({
             timeout: timeout * 1000,
-            baseURL: this.getBaseURL()
+            baseURL: url
         })
         this.http.interceptors.request.use((request) => {
             log.verbose(
@@ -86,7 +90,7 @@ class SimplePadAPI {
         return (
             this.options.endpoint ||
             process.env.SIMPLEPAD_ENDPOINT ||
-            'http://121.199.64.183:8877'
+            '121.199.64.183:8877'
         )
     }
 
@@ -102,7 +106,11 @@ class SimplePadAPI {
     }
 
     GetWebSocketServerURL(): string {
-        return this.getBaseURL() + '/ws?token=' + this.options.token
+        let url = this.getBaseURL() + '/ws?token=' + this.options.token
+        if (url.indexOf('http') === -1) {
+            url = 'ws://' + url
+        }
+        return url
     }
 
     // ---- 基本操作 ----

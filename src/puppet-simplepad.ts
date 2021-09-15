@@ -220,12 +220,12 @@ class PuppetSimplePad extends Puppet {
             }, 10000)
         })
         this._ws?.on('message', async (recv: WebSocket.Data) => {
-            if (typeof recv === 'string') {
-                if (recv === HeartbeatCheckReply) {
+            if (Buffer.isBuffer(recv)) {
+                if (recv.toString() === HeartbeatCheckReply) {
                     return
                 }
                 // 终端主动退出账户
-                if (recv === ClientQuitAccount) {
+                if (recv.toString() === ClientQuitAccount) {
                     log.info(`${this._self?.nickName}在手机端退出登录`)
 
                     this._wsNeedReconnect = false
@@ -237,7 +237,7 @@ class PuppetSimplePad extends Puppet {
 
                 log.verbose('recv', recv)
                 try {
-                    const recvData = JSONParse(recv)
+                    const recvData = JSONParse(recv.toString())
                     // 接收到的各种推送消息
                     if (recvData.data.reportMsgType === ReportType.Message) {
                         const msg = (recvData as ReceiveData<Message>).data
@@ -367,6 +367,10 @@ class PuppetSimplePad extends Puppet {
                 } catch (err) {
                     log.error(`解析JSON数据失败:${err},数据:${recv}`)
                 }
+            } else {
+                log.error(
+                    `接收到的数据类型为:",${typeof recv},请联系开发者处理`
+                )
             }
         })
         this._ws?.on('close', async () => {

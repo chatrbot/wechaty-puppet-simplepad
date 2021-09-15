@@ -24,12 +24,12 @@ export class CacheManager {
 
     private _messageCache?: LRU<string, Message> // because message count may be massive, so we just keep them in memory with LRU and with limited capacity
     private _messageRevokeCache?: LRU<string, MessageRevokeInfo>
-    private _contactCache?: FlashStoreSync<Contact>
+    private _contactCache?: FlashStoreSync<string, Contact>
     private _contactSearchCache?: LRU<string, SearchContact>
-    private _roomCache?: FlashStoreSync<Contact>
-    private _roomMemberCache?: FlashStoreSync<RoomMemberMap>
-    private _roomInvitationCache?: FlashStoreSync<RoomInvitationPayload>
-    private _friendshipCache?: FlashStoreSync<FriendshipPayload>
+    private _roomCache?: FlashStoreSync<string, Contact>
+    private _roomMemberCache?: FlashStoreSync<string, RoomMemberMap>
+    private _roomInvitationCache?: FlashStoreSync<string, RoomInvitationPayload>
+    private _friendshipCache?: FlashStoreSync<string, FriendshipPayload>
 
     private _labelList?: Label[]
 
