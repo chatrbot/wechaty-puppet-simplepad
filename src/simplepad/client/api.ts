@@ -106,9 +106,15 @@ class SimplePadAPI {
     }
 
     GetWebSocketServerURL(): string {
-        let url = this.getBaseURL() + '/ws?token=' + this.options.token
-        if (url.indexOf('http') === -1) {
-            url = 'ws://' + url
+        const url = this.getBaseURL() + '/ws?token=' + this.options.token
+        if (url.indexOf('https://') > -1) {
+            return url.replace('https://', 'ws://')
+        }
+        if (url.indexOf('http://') > -1) {
+            return url.replace('http://', 'ws://')
+        }
+        if (url.indexOf('ws://') === -1) {
+            return 'ws://' + url
         }
         return url
     }

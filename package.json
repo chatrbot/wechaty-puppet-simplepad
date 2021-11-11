@@ -1,6 +1,6 @@
 {
   "name": "wechaty-puppet-simplepad",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Another implementation of Wechaty-Puppet",
   "files": [
     "/dist",
